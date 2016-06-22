@@ -76,25 +76,19 @@
 	}
 	
 	var baseAjaxRequestMain=function(Method){
-		var Method=Method.toUpperCase(),url=_Gax.url,data=null,isLegal=false;
+		var Method=Method.toUpperCase(),url=_Gax.url,data=null;
 		switch(Method){
 			case "GET":
-				isLegal=true;
 				url=_Gax.url+"?"+_Gax.data;
 				break;
 			case "POST":
-				isLegal=true;
 				data=_Gax.data;
-				break;
-			case "HEAD":
-				isLegal=true;
 				break;
 		}
 		_Gax.args.url = _Gax.url;
 		_Gax.args.data = _Gax.data;
 		_Gax.args.obj = _Gax;
 
-		if(isLegal){
 			if(window.fetch){
 				fetch(url,{
 					method:Method,
@@ -105,6 +99,10 @@
 						res.text().then(function(_data){
 							_Gax.resData=_data;
 							if(_Gax.config.type.toLowerCase()==="json")_Gax.resData=JSON.parse(_Gax.resData);
+							_Gax.resHeaders=[];
+							res.headers.forEach(function(value,index){
+								_Gax.resHeaders[index]=value;
+							});
 							_Gax.status=SUCCESS;
 							finish();
 						});
@@ -131,6 +129,11 @@
 					if(_Gax.xhr.status==200){
 						_Gax.resData=JSON.stringify(_Gax.xhr.responseXML)==null?_Gax.xhr.responseText:_Gax.xhr.responseXML;
 						if(_Gax.config.type.toLowerCase()==="json")_Gax.resData=JSON.parse(_Gax.resData);
+						_Gax.resHeaders=[];
+						_Gax.xhr.getAllResponseHeaders().split("\r\n").forEach(function(value){
+							var temValue=value.split(/\s*:\s*/);
+							temValue[0]!="" && (_Gax.resHeaders[temValue[0]]=temValue[1]);
+						});
 						_Gax.status=SUCCESS;
 						finish();
 					}else{
@@ -153,10 +156,6 @@
 				finish();
 			}
 			return true;
-		}
-		_Gax.status=ERROR;
-		_Gax.args.reason="Does not support this method : "+Method+" !";
-		return false;
 	}
 
 	var crossOrigin=function(){
