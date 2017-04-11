@@ -1,6 +1,6 @@
-<script src="gax.js"></script>
+<script src="./gax.js"></script>
 <script>
-Gax("http://127.0.0.1/gaxtest.php").get().success(function(data){
+Gax("http://api.asilu.com/ip/").set("jsonpCallBack","ip").get().success(function(data) {
 	console.log(arguments);
 });
 </script>

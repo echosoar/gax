@@ -10,6 +10,7 @@
 		if(!(this instanceof Gax)){
 			return new Gax(url);
 		}
+
 		_Gax=this;
 		_Gax.startTime=new Date();
 		_Gax.objid=Math.ceil(_Gax.startTime);
@@ -25,18 +26,27 @@
 			type:"text",
 			timeout:0,
 			ontimeout:function(){},
-			com:"jsonp"
+			com:"jsonp",
+			jsonpCallBackKey: 'callback',
+			jsonpCallBack: false,
+			jsonpCallBackNode: null
 		}
 		this.isOrigin=checkOrigin();
 	}
-	
+
 	var checkOrigin=function(){
 		var reg=new RegExp("^"+window.location.origin,"i");
 		var notHttp=/^(?!http([s]?):\/\/)/i;
 		return reg.test(_Gax.url)||notHttp.test(_Gax.url);
 	}
-	
+
 	var crossOriginByJSONP=function(){
+		if(_Gax.config.jsonpCallBack) {
+			_Gax.config.jsonpCallBackNode = document.createElement('script');
+			_Gax.config.jsonpCallBackNode.innerHTML = ';function ' + _Gax.config.jsonpCallBack + '(data) {GaxJsonp( "' + _Gax.objid +'", data);}';
+			_h.appendChild(_Gax.config.jsonpCallBackNode);
+		}
+
 		var temScript=document.createElement("script");
 		temScript.setAttribute("src",_Gax.url+"?"+_Gax.data);
 		_h.appendChild(temScript);
@@ -44,6 +54,7 @@
 	}
 	var jsonpCallBack=function(objid,data){
 		var _Gax=global.GaxQueue[objid];
+		if(_Gax.config.jsonpCallBack) _Gax.config.jsonpCallBackNode.remove();
 		_Gax.jsonpNode.remove();
 		delete _Gax.jsonpNode;
 		_Gax.resData=data;
@@ -52,6 +63,7 @@
 	}
 
 	var dataToUrl=function(obj){
+
 		var value=[];
 		for(var key in obj){
 			value.push(encodeURIComponent(key));
@@ -59,22 +71,32 @@
 			value.push(encodeURIComponent(obj[key]));
 			value.push("&");
 		}
+
+
 		if(!checkOrigin()&&_Gax.config.com.toLowerCase()==="jsonp"){
-			value.push("gaxid");
-			value.push("=");
-			value.push(_Gax.objid);
+
+			if(_Gax.config.jsonpCallBack){
+				value.push(_Gax.config.jsonpCallBackKey);
+				value.push("=");
+				value.push(_Gax.config.jsonpCallBack);
+			}else{
+				value.push("gaxid");
+				value.push("=");
+				value.push(_Gax.objid);
+			}
+
 		}else{
 			value.pop();
 		}
 		return value.join("");
 	}
-	
+
 	var baseAjaxRequestSetHeader=function(){
 		for(var key in _Gax.headerQueue){
 			_Gax.xhr.setRequestHeader(key,_Gax.headerQueue[key]);
 		}
 	}
-	
+
 	var baseAjaxRequestMain=function(Method){
 		var Method=Method.toUpperCase(),url=_Gax.url,data=null;
 		switch(Method){
@@ -118,7 +140,7 @@
 				});
 				return true;
 			}
-			
+
 			_Gax.baseAjaxRequest();
 			_Gax.xhr.open(Method,url,true);
 			baseAjaxRequestSetHeader();
@@ -163,7 +185,7 @@
 			crossOriginByJSONP();
 		}
 	}
-	
+
 	var finish=function(){
 		if(arguments.length>0)_Gax=global.GaxQueue[arguments[0]];
 		_Gax.args.time=(new Date())-_Gax.startTime;
@@ -178,7 +200,7 @@
 			}
 		}
 	}
-	
+
 	Gax.prototype.baseAjaxRequest=function(){
 		if(window.XMLHttpRequest){
 			this.xhr=new XMLHttpRequest();
@@ -195,17 +217,20 @@
 		}
 		return this;
 	}
-	
+
 	Gax.prototype.header=function(key,value){
 		_Gax.headerQueue[key]=value;
 		return this;
 	}
-	
+
 	Gax.prototype.set=function(key,value){
+		if(key == 'jsonpCallBack' || key == 'callback') {
+			key = 'jsonpCallBack';
+		}
 		_Gax.config[key]=value;
 		return this;
 	}
-	
+
 	Gax.prototype.get=function(data){
 		this.data=dataToUrl(data);
 		this.method="GET";
@@ -220,7 +245,7 @@
 		}
 		return this;
 	}
-	
+
 	Gax.prototype.post=function(data){
 		this.data=dataToUrl(data);
 		this.method="POST";
@@ -234,8 +259,8 @@
 		}
 		return this;
 	}
-	
-	
+
+
 	Gax.prototype.success=function(fn){
 		if(_Gax.status===PENDING){
 			_Gax.successQueue.push(fn);
@@ -244,7 +269,7 @@
 		}
 		return this;
 	}
-	
+
 	Gax.prototype.error=function(fn){
 		if(_Gax.status===PENDING){
 			_Gax.errorQueue.push(fn);
