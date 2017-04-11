@@ -12,7 +12,7 @@
 Gax("http://iwenku.net");
 ```
 ***
-#####配置设置 set(key,value)
+##### 配置设置 set(key,value)
 > key ：要设置配置选项的键
 
 > value : 要设置配置选项的值
@@ -24,7 +24,7 @@ Gax("http://iwenku.net");
 Gax("http://iwenku.net").set("type","json");
 ```
 ***
-#####HTTP头信息设置 header(key,value)
+##### HTTP头信息设置 header(key,value)
 > key ：要设置的头
 
 > value : 要设置的头内容
@@ -35,7 +35,7 @@ Gax("http://iwenku.net").set("type","json");
 Gax("http://iwenku.net").set("type","json").header("Content-Type","application/x-www-form-urlencoded");
 ```
 ***
-#####GET请求方法 get(dataObject)
+##### GET请求方法 get(dataObject)
 >dataObject是一个对象，是要传向目标URL的内容。
 
 > 此方法返回一个Gax对象。
@@ -44,7 +44,7 @@ Gax("http://iwenku.net").set("type","json").header("Content-Type","application/x
 Gax("http://iwenku.net").set("type","json").header("Content-Type","application/x-www-form-urlencoded").get({name:"gax"});
 ```
 ***
-#####POST请求方法 post(dataObject)
+##### POST请求方法 post(dataObject)
 >dataObject是一个对象，是要传向目标URL的内容。
 
 > 此方法返回一个Gax对象。
@@ -53,7 +53,7 @@ Gax("http://iwenku.net").set("type","json").header("Content-Type","application/x
 Gax("http://iwenku.net").post({name:"gax"});
 ```
 ***
-#####成功回调函数 success(callback(data[,args]))
+##### 成功回调函数 success(callback(data[,args]))
 >callback是一个函数，当请求成功时会将返回的数据根据配置中的type来进行处理，然后传入callback。
 
 >args中存储着耗时等信息。
@@ -66,7 +66,7 @@ Gax("http://iwenku.net").get().success(function(data){
 });
 ```
 ***
-#####失败回调函数 error(callback(args))
+##### 失败回调函数 error(callback(args))
 >callback是一个函数，在请求失败时执行，args中存储着失败的原因，耗时等信息。
 
 > 此方法返回一个Gax对象。
@@ -76,5 +76,16 @@ Gax("http://iwenku.net").get().success(function(data){
 	console.log(data);
 }).error(function(args){
 	console.log(args);
+});
+```
+##### jsonp自动回调配置
+
+只要使用set配置了jsonpCallBack的值，Gax就会自动去处理jsonp的请求，发出的请求后面会携带callback=${jsonpCallBack}
+
+callback也可以进行设置，使用set设置jsonpCallBackKey就可以了
+
+```javascript
+Gax("http://api.asilu.com/ip/").set("jsonpCallBackKey","callback").set("jsonpCallBack","ip").get().success(function(data) {
+	console.log(arguments);
 });
 ```
