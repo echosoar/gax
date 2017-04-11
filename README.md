@@ -32,7 +32,7 @@ Gax("http://iwenku.net").set("type","json");
 > 此方法返回一个Gax对象。
 
 ```javascript
-Gax("http://iwenku.net").set("type","json").header("COntent-Type","application/x-www-form-urlencoded");
+Gax("http://iwenku.net").set("type","json").header("Content-Type","application/x-www-form-urlencoded");
 ```
 ***
 #####GET请求方法 get(dataObject)
@@ -41,7 +41,7 @@ Gax("http://iwenku.net").set("type","json").header("COntent-Type","application/x
 > 此方法返回一个Gax对象。
 
 ```javascript
-Gax("http://iwenku.net").set("type","json").header("COntent-Type","application/x-www-form-urlencoded").get({name:"gax"});
+Gax("http://iwenku.net").set("type","json").header("Content-Type","application/x-www-form-urlencoded").get({name:"gax"});
 ```
 ***
 #####POST请求方法 post(dataObject)
